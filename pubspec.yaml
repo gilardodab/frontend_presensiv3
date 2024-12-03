@@ -1,0 +1,67 @@
+name: frontend_presensiv3
+description: "A new Flutter project."
+
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.4.4 <4.0.0'
+
+
+dependencies:
+  flutter:
+    sdk: flutter
+  barcode_scan2: ^4.2.0
+  bloc: ^8.0.0
+  cached_network_image: ^3.2.0 # Untuk menampilkan gambar yang di-cache
+  calendar_timeline: ^1.1.2
+  camera: ^0.10.5+9
+  cupertino_icons: ^1.0.6
+  connectivity_plus: ^2.3.0  # Check for the latest version on pub.dev
+  dartz: ^0.10.1
+  detect_fake_location: ^2.0.0
+  dio: ^5.0.0 
+  dotted_border: ^2.1.0
+  flutter_bloc: ^8.0.0
+  flutter_svg: ^2.0.9
+  freezed_annotation: ^2.4.1
+  # gallery_saver: ^2.3.0
+  geolocator: ^9.0.2
+  get_it: ^8.0.0
+  google_fonts: ^5.1.0
+  google_maps_flutter: ^2.2.1
+  http: ^1.2.2
+  image_picker: ^1.1.0
+  image: ^3.0.1
+  flutter_form_builder: ^7.0.0
+  intl: ^0.17.0
+  path: ^1.8.3
+  provider: ^6.0.5
+  path_provider: ^2.0.9
+  qr_flutter: ^4.0.0
+  shared_preferences: ^2.0.6
+  shimmer: ^2.0.0
+  equatable: ^2.0.3
+
+dev_dependencies:
+  build_runner: ^2.4.6
+  flutter_gen_runner: ^5.3.2
+  flutter_lints: ^2.0.0
+  flutter_test:
+    sdk: flutter
+  freezed: ^2.5.2
+
+flutter:  
+  uses-material-design: true
+  assets:
+    - assets/images/
+    - assets/icons/
+    - assets/icons/menu/
+    - assets/icons/nav/
+
+flutter_gen:
+  output: lib/core/assets/
+  integrations:
+    flutter_svg: true
