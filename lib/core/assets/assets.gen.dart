@@ -92,10 +92,6 @@ class $AssetsImagesGen {
   /// File path: assets/images/logo.png
   AssetGenImage get logo => const AssetGenImage('assets/images/logo.png');
 
-  /// File path: assets/images/logo_code_with_bahri.png
-  AssetGenImage get logoCodeWithBahri =>
-      const AssetGenImage('assets/images/logo_code_with_bahri.png');
-
   /// File path: assets/images/logo_white.png
   AssetGenImage get logoWhite =>
       const AssetGenImage('assets/images/logo_white.png');
@@ -123,7 +119,6 @@ class $AssetsImagesGen {
         failed,
         imgMyLocation,
         logo,
-        logoCodeWithBahri,
         logoWhite,
         logoYofagroup,
         notification,

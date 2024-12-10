@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart'; // Untuk memformat tanggal
+import 'package:intl/intl.dart';
+import '../../../data/datasources/callplan_remote_datasource.dart';
+import '../../../data/models/response/callplan_response_model.dart';
 
 class CallPlanPage extends StatefulWidget {
   const CallPlanPage({super.key});
@@ -9,15 +11,16 @@ class CallPlanPage extends StatefulWidget {
 }
 
 class _CallPlanPageState extends State<CallPlanPage> {
-  // Data dummy untuk Call Plans
-  List<Map<String, String>> callPlans = [
-    {"id": "1", "name": "Jakarta", "date": "2024-12-01", "status": "Belum Selesai"},
-    {"id": "2", "name": "Yogyakarta", "date": "2024-12-05", "status": "Selesai"},
-    {"id": "3", "name": "Jawa Timur", "date": "2024-12-08", "status": "Belum Selesai"},
-  ];
-
+  
+  List<CallPlanModel> callPlans = [];
   DateTime? startDate;
   DateTime? endDate;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchCallPlans();
+  }
 
   // Fungsi untuk memformat tanggal
   String? formatDate(DateTime? date) {
@@ -25,15 +28,39 @@ class _CallPlanPageState extends State<CallPlanPage> {
     return DateFormat('yyyy-MM-dd').format(date);
   }
 
+  // Fungsi untuk mengambil data Call Plans dari API
+Future<void> fetchCallPlans() async {
+  try {
+    String? startDateString = formatDate(startDate);
+    String? endDateString = formatDate(endDate);
+
+    if (startDateString != null && endDateString != null) {
+      List<CallPlanModel> plans = await CallPlanDataSource().loadCallPlans(
+        startDateString,
+        endDateString,
+      );
+      setState(() {
+        callPlans = plans;
+      });
+    } else {
+      // Handle the case where startDate or endDate is null
+      print('Error: start date or end date is null');
+    }
+  } catch (e) {
+    // Handle error
+    print('Error fetching call plans: $e');
+  }
+}
+
   // Fungsi untuk menampilkan data yang difilter berdasarkan tanggal
-  List<Map<String, String>> filterCallPlans() {
+  List<CallPlanModel> filterCallPlans() {
     if (startDate == null || endDate == null) {
       return callPlans;
     }
     return callPlans.where((plan) {
-      DateTime planDate = DateFormat('yyyy-MM-dd').parse(plan['date']!);
-      return planDate.isAfter(startDate!.subtract(Duration(days: 1))) &&
-          planDate.isBefore(endDate!.add(Duration(days: 1)));
+      DateTime planDate = DateFormat('yyyy-MM-dd').parse(plan.tanggalCp);
+      return planDate.isAfter(startDate!.subtract(const Duration(days: 1))) &&
+          planDate.isBefore(endDate!.add(const Duration(days: 1)));
     }).toList();
   }
 
@@ -41,6 +68,7 @@ class _CallPlanPageState extends State<CallPlanPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           color: Colors.white,
@@ -55,19 +83,17 @@ class _CallPlanPageState extends State<CallPlanPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Input untuk tanggal mulai
             Row(
               children: [
                 Expanded(
                   child: TextField(
                     readOnly: true,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       labelText: 'Tanggal Mulai',
                       hintText: 'Pilih Tanggal Mulai',
                       border: OutlineInputBorder(),
                     ),
-                    controller: TextEditingController(
-                        text: formatDate(startDate)),
+                    controller: TextEditingController(text: formatDate(startDate)),
                     onTap: () async {
                       final selectedDate = await showDatePicker(
                         context: context,
@@ -84,7 +110,6 @@ class _CallPlanPageState extends State<CallPlanPage> {
                   ),
                 ),
                 const SizedBox(width: 16),
-                // Input untuk tanggal sampai
                 Expanded(
                   child: TextField(
                     readOnly: true,
@@ -93,8 +118,7 @@ class _CallPlanPageState extends State<CallPlanPage> {
                       hintText: 'Tanggal Sampai',
                       border: OutlineInputBorder(),
                     ),
-                    controller: TextEditingController(
-                        text: formatDate(endDate)),
+                    controller: TextEditingController(text: formatDate(endDate)),
                     onTap: () async {
                       final selectedDate = await showDatePicker(
                         context: context,
@@ -113,107 +137,41 @@ class _CallPlanPageState extends State<CallPlanPage> {
               ],
             ),
             const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  // Tombol Tampilkan
-                  ElevatedButton(
-                    onPressed: () {
-                      setState(() {});
-                    },
-                    child: const Text('Tampilkan'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color.fromARGB(255, 114, 76, 175),
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                  onPressed: fetchCallPlans,
+                  child: const Text('Tampilkan'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromARGB(255, 114, 76, 175),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  const SizedBox(width: 16), // Spasi antara Tombol Tampilkan dan Tombol Refresh
-
-                  // Tombol Refresh
-                  ElevatedButton(
-                    onPressed: () {
-                      setState(() {
-                        startDate = null;
-                        endDate = null;
-                      });
-                    },
-                    child: const Text('Refresh'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color.fromARGB(255, 114, 76, 175),
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
+                ),
+                const SizedBox(width: 16),
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      startDate = null;
+                      endDate = null;
+                    });
+                    fetchCallPlans();
+                  },
+                  child: const Text('Refresh'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromARGB(255, 114, 76, 175),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  const SizedBox(width: 16), // Spasi antara Tombol Refresh dan Tombol Tambah
-
-                  // Tombol Tambah
-                  ElevatedButton(
-                    onPressed: () {
-                      // Implementasikan logika untuk menambah data
-                      showDialog(context: context, builder: (context) => AlertDialog(
-                        title: const Text('Tambah Call Plan'),
-                        content: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            TextField(
-                              decoration: const InputDecoration(labelText: 'Nama'),
-                              onChanged: (value) {
-                                // Implementasikan logika untuk menyimpan data
-                                setState(() {
-                                  callPlans.add({
-                                    "id": (callPlans.length + 1).toString(),
-                                    "name": value,
-                                    "date": DateFormat('yyyy-MM-dd').format(DateTime.now()),
-                                    "status": "Belum Selesai",
-                                  });
-                                });
-                              },
-                            ),
-                          ],
-                        ),
-                        actions: [
-                          TextButton(
-                            child: const Text('Batal'),
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                          ),
-                          TextButton(
-                            child: const Text('Simpan'),
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                          ),
-                        ],
-                      ));
-                      // setState(() {
-                      //   callPlans.add({
-                      //     "id": (callPlans.length + 1).toString(),
-                      //     "name": "Jakarta",
-                      //     "date": DateFormat('yyyy-MM-dd').format(DateTime.now()),
-                      //     "status": "Belum Selesai",
-                      //   });
-                      // });
-                    },
-                    child: const Text('Tambah'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color.fromARGB(255, 114, 76, 175),
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-
+                ),
+              ],
+            ),
             const SizedBox(height: 16),
-            // Untuk menampilkan data Call Plans menggunakan card
             Expanded(
               child: ListView.builder(
                 itemCount: filterCallPlans().length,
@@ -221,63 +179,38 @@ class _CallPlanPageState extends State<CallPlanPage> {
                   final plan = filterCallPlans()[index];
                   return Card(
                     child: ListTile(
-                      title: Text(plan['name']!),
-                      subtitle: Text(plan['date']!),
-                      // trailing: Text(plan['status']!),
-                          
-                      //button delete 
-                      trailing:
-                      Row(
+                      title: Text(plan.namaOutlet),
+                      subtitle: Text(plan.tanggalCp),
+                      trailing: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           IconButton(
                             icon: const Icon(Icons.edit),
                             color: Colors.green,
-                            onPressed: () {
-                              setState(() {
-                                _editData(context, plan);
-                              });
+                            onPressed: () async {
+                              final updatedPlan = CallPlanModel(
+                                callplanId: plan.callplanId,
+                                employeesId: plan.employeesId,
+                                tanggalCp: plan.tanggalCp,
+                                namaOutlet: 'Updated Outlet',
+                                description: plan.description,
+                                createdAt: plan.createdAt,
+                                updatedAt: DateTime.now().toIso8601String(),
+                              );
+                              await CallPlanDataSource().updateCallPlan(updatedPlan);
+                              fetchCallPlans();
                             },
                           ),
                           IconButton(
                             icon: const Icon(Icons.delete),
                             color: Colors.red,
-                            onPressed: () {
-                              showDialog(context: 
-                              context, builder: (context) => AlertDialog(
-                                title: const Text('Hapus Call Plan'),
-                                //with name
-                                content: Text('Apakah Anda yakin ingin menghapus Call Plan ini?' ' ' '(${plan['name']})'),
-                                actions: [
-                                  TextButton(
-                                    child: const Text('Batal'),
-                                    onPressed: () {
-                                      Navigator.pop(context);
-                                    },
-                                  ),
-                                  TextButton(
-                                    child: const Text('Hapus'),
-                                    onPressed: () {
-                                      setState(() {
-                                        callPlans.remove(plan);
-                                      });
-                                      Navigator.pop(context);
-                                    },
-                                  ),
-                                ],
-                              ),
-                              );  
-                              // setState(() {
-                              //   callPlans.remove(plan);
-                              // });
+                            onPressed: () async {
+                              await CallPlanDataSource().deleteCallPlan(plan.callplanId);
+                              fetchCallPlans();
                             },
                           ),
-                            ],
+                        ],
                       ),
-                      onTap: () {
-                        // Menampilkan modal untuk edit data
-                        // _editData(context, plan);
-                      },
                     ),
                   );
                 },
@@ -286,64 +219,6 @@ class _CallPlanPageState extends State<CallPlanPage> {
           ],
         ),
       ),
-    );
-  }
-
-  // Fungsi untuk menampilkan modal edit
-  void _editData(BuildContext context, Map<String, String> plan) {
-    final nameController = TextEditingController(text: plan['name']);
-    // final dateController = TextEditingController(text: plan['date']);
-    //input tanggalcpicker 
-    final dateController = TextEditingController(text: plan['date']);
-    final statusController = TextEditingController(text: plan['status']);
-
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Edit Call Plan'),
-          content: SingleChildScrollView(
-            child: Column(
-              children: [
-                TextField(
-                  controller: nameController,
-                  decoration: const InputDecoration(labelText: 'Name'),
-                ),
-                TextField(
-                  controller: dateController,
-                  decoration: const InputDecoration(labelText: 'Date'),
-                ),
-                TextField(
-                  controller: statusController,
-                  decoration: const InputDecoration(labelText: 'Status'),
-                ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                // Membatalkan perubahan dan menutup dialog
-                Navigator.pop(context);
-              },
-              child: const Text('Cancel'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                // Update data call plan di list
-                setState(() {
-                  plan['name'] = nameController.text;
-                  plan['date'] = dateController.text;
-                  plan['status'] = statusController.text;
-                });
-                // Menutup dialog setelah menyimpan perubahan
-                Navigator.pop(context);
-              },
-              child: const Text('Save'),
-            ),
-          ],
-        );
-      },
     );
   }
 }

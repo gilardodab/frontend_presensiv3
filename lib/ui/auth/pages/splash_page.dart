@@ -35,7 +35,6 @@ class _SplashPageState extends State<SplashPage> {
                   child: Assets.images.logoYofagroup.image(),
                 ),
                 // const Spacer(),
-                // Assets.images.logoCodeWithBahri.image(height: 70),
                 // const SpaceHeight(20.0),
               ],
             );
@@ -62,7 +61,6 @@ class _SplashPageState extends State<SplashPage> {
                 child: Assets.images.logoYofagroup.image(),
               ),
               const Spacer(),
-              Assets.images.logoCodeWithBahri.image(height: 70),
               const SpaceHeight(20.0),
             ],
           );

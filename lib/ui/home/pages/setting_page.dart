@@ -5,6 +5,7 @@ import 'package:frontend_presensiv3/ui/home/pages/tos_privacy_page.dart';
 import '../../../core/core.dart';
 import '../../../data/datasources/auth_local_datasource.dart';
 
+import '../../auth/bloc/logout/logout_bloc.dart';
 import '../../auth/pages/login_screen.dart';
 import 'notification_page.dart';
 import 'user_password_page.dart';
@@ -150,8 +151,8 @@ class SettingPage extends StatelessWidget {
                       TextButton(
                         child: const Text('Logout'),
                         onPressed: () {
-                          // context.read<AuthLocalDatasource>().logout();
-                          // context.push(const LoginScreen());
+                         context.read<LogoutBloc>().add(const LogoutEvent.logout());
+                         context.push(const LoginPage());
                         },
                       ),
                     ],

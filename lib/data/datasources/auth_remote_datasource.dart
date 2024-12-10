@@ -5,6 +5,7 @@ import 'package:dio/dio.dart';
 import 'package:frontend_presensiv3/core/constants/variables.dart';
 import 'package:http/http.dart' as http;
 import '../models/response/auth_response_model.dart';
+import '../models/response/unauthenticated_response_model.dart';
 import 'auth_local_datasource.dart';
 
 class AuthRemoteDatasource {
@@ -36,24 +37,24 @@ class AuthRemoteDatasource {
   }
 
   //logout
-  // Future<Either<UnauthenticatedResponseModel, String>> logout() async {
-  //   final authData = await AuthLocalDatasource().getAuthData();
-  //   final url = Uri.parse('${Variables.baseUrl}/api/logout');
-  //   final response = await http.post(
-  //     url,
-  //     headers: {
-  //       'Accept': 'application/json',
-  //       'Content-Type': 'application/json',
-  //       'Authorization': 'Bearer ${authData?.token}',
-  //     },
-  //   );
+  Future<Either<UnauthenticatedResponseModel, String>> logout() async {
+    final authData = await AuthLocalDatasource().getAuthData();
+    final url = Uri.parse('${Variables.baseUrl}/logout');
+    final response = await http.post(
+      url,
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ${authData?.token}',
+      },
+    );
 
-  //   if (response.statusCode == 200) {
-  //     return const Right('Logged in successfully');
-  //   } else {
-  //     return Left(UnauthenticatedResponseModel.fromJson(response.body));
-  //   }
-  // }
+    if (response.statusCode == 200) {
+      return const Right('Logged in successfully');
+    } else {
+      return Left(UnauthenticatedResponseModel.fromJson(response.body));
+    }
+  }
 
 
 

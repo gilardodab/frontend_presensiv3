@@ -81,7 +81,7 @@ class _HomeScreenState extends State<HomeScreen> {
     });
 
     await Future.delayed(const Duration(seconds: 2));
-    // _checkFakeLocation();
+    _checkFakeLocation();
     _photo();
     context.read<PresensiBloc>().add(presensi_event.FetchPresensiData());
     setState(() {
