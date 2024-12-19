@@ -31,14 +31,14 @@ class AddPresensiDataSource {
     } else if (response.statusCode == 200) {
       // Resource not found
       // You can return a specific response, for example:
-      return AddPresensiResponseModel(status: 'success', message: 'Attendance recorded successfully');
+      return AddPresensiResponseModel(status: 'success', message: 'Presensi Berhasil dilakukan');
     } else if (response.statusCode == 400) {
       // Unauthorized, probably token expired or invalid credentials
       // Return a response with an appropriate message, for example:
-      return AddPresensiResponseModel(status: 'error', message: 'You have already checked out today');
+      return AddPresensiResponseModel(status: 'error', message: 'Kamu sudah melakukan presensi sebelumnya');
     } else {
       // For all other status codes
-      throw Exception('Failed to record attendance. Status code: ${response.statusCode}');
+      throw Exception('Gagal melakukan presensi. Status code: ${response.statusCode}');
     }
   }
 }

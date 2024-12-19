@@ -1,86 +1,125 @@
+import 'package:dartz/dartz.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../../core/constants/variables.dart';
 import '../models/response/cuti_response_model.dart';
 import 'auth_local_datasource.dart';
 
-class CutiDataSource {
-  // Access AuthLocalDatasource directly without storing it as a field
-  final AuthLocalDatasource _authLocalDatasource = AuthLocalDatasource();
+class CutiRemoteDataSource {
+  // Future<Either<String, CutiResponseModel>> fetchCutiData( String fromDate, String toDate) async {
+  //   final authData = await AuthLocalDatasource().getAuthData();
+  //   final token = authData?.token;
+  //   final response = await http.get(
+  //     Uri.parse('${Variables.baseUrl}/cuti/data-cuti?from=$fromDate&to=$toDate'),
+  //     headers: {'Authorization': 'Bearer $token'},
+  //   );
 
-  // Helper function to handle common HTTP request logic
-  Future<http.Response> _makeRequest(
-    String url,
-    String method, {
-    Map<String, String>? headers,
-    dynamic body,
-  }) async {
-    final authData = await _authLocalDatasource.getAuthData();
-    if (authData?.token == null) {
-      throw Exception('Token is null');
+  //   if (response.statusCode == 200) {
+  //     final Map<String, dynamic> responseData = json.decode(response.body);
+  //     return Right(CutiResponseModel.fromMap(responseData)); // Corrected to use fromMap
+  //   } else {
+  //     return const Left('Failed to fetch cuti data');
+  //   }
+  // }
+
+    Future<Either<String, CutiResponseModel>> fetchCutiDataBulan() async {
+    final authData = await AuthLocalDatasource().getAuthData();
+    final token = authData?.token;
+    final response = await http.get(
+      Uri.parse('${Variables.baseUrl}/cuti/data-cuti'),
+      headers: {'Authorization': 'Bearer $token'},
+    );
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> responseData = json.decode(response.body);
+      return Right(CutiResponseModel.fromMap(responseData)); // Corrected to use fromMap
+    } else {
+      return const Left('Gagal Memuat data cuti');
     }
-
-    final requestHeaders = {
-      'Authorization': 'Bearer ${authData?.token}',
-      'Content-Type': 'application/json',
-      ...?headers, // Merge additional headers if provided
-    };
-
-    final uri = Uri.parse(url);
-    http.Response response;
-
-    switch (method.toLowerCase()) {
-      case 'get':
-        response = await http.get(uri, headers: requestHeaders);
-        break;
-      case 'post':
-        response = await http.post(uri, headers: requestHeaders, body: json.encode(body));
-        break;
-      case 'put':
-        response = await http.put(uri, headers: requestHeaders, body: json.encode(body));
-        break;
-      case 'delete':
-        response = await http.delete(uri, headers: requestHeaders);
-        break;
-      default:
-        throw Exception('Unsupported HTTP method: $method');
-    }
-
-    if (response.statusCode != 200) {
-      throw Exception('Failed to make request. Status code: ${response.statusCode}. Response: ${response.body}');
-    }
-
-    return response;
-  }
-
-  // Fetch the cuti data
-  Future<List<Cuti>> fetchCutiData() async {
-    final response = await _makeRequest('${Variables.baseUrl}/cuti/data-cuti', 'get');
-    final data = json.decode(response.body);
-    final List<dynamic> cutiList = data['data'];
-    return cutiList.map((cutiJson) => Cuti.fromJson(cutiJson)).toList();
   }
 
   // Add a new cuti
-  Future<void> addCuti(Cuti cuti) async {
-    await _makeRequest(
-      '${Variables.baseUrl}/cuti/tambah-data-cuti',
-      'post',
-      body: cuti.toJson(),
+  Future<Either<String,void>> addCuti(Cuti cuti) async {
+    print(cuti.cutyStart);
+      final authData = await AuthLocalDatasource().getAuthData();
+      final token = authData?.token;
+      final response = await http.post(
+      Uri.parse('${Variables.baseUrl}/cuti/tambah-data-cuti'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'cuty_start' : cuti.cutyStart,
+        'cuty_end' : cuti.cutyEnd,
+        'date_work' : cuti.dateWork,
+        'cuty_total' : cuti.cutyTotal,
+        'cuty_description' : cuti.cutyDescription,
+      }),
     );
+    if (response.statusCode == 200) {
+      return const Right(null);
+    }else if (response.statusCode == 422) {
+      return const Left('Failed to add cuti 422');
+    }else if (response.statusCode == 500) {
+      return const Left('Failed to add cuti 500');
+    }
+     else {
+      return const Left('Gagal Menambahkan Permohonan Cuti');
+    }
   }
 
   // Edit an existing cuti
-  Future<void> editCuti(int id, Cuti cuti) async {
-    await _makeRequest(
-      '${Variables.baseUrl}/cuti/edit-data-cuti/$id',
-      'put',
-      body: cuti.toJson(),
+  Future<Either<String, void>> editCuti(Cuti cuti) async {
+    final authData = await AuthLocalDatasource().getAuthData();
+    final token = authData?.token;
+    print(cuti.cutyId);
+    final response = await http.put(
+      Uri.parse(
+      '${Variables.baseUrl}/cuti/edit-data-cuti/${cuti.cutyId}',
+      ),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+      body: json.encode(cuti.toMap()),
     );
+
+    if (response.statusCode == 200) {
+      return const Right(null);
+    }else if (response.statusCode == 422) {
+      return const Left('Failed to add cuti 422');
+    }else if (response.statusCode == 500) {
+      return const Left('Failed to add cuti 500');
+    }
+     else {
+      return const Left('Gagal Menambahkan Data Cuti');
+    }
   }
 
   // Delete a cuti
-  Future<void> deleteCuti(int id) async {
-    await _makeRequest('${Variables.baseUrl}/cuti/hapus-data-cuti/$id', 'delete');
+  Future<Either<String, void>> deleteCuti(Cuti cuti) async {
+      final authData = await AuthLocalDatasource().getAuthData();
+      final token = authData?.token;
+
+  // Prepare the payload with the cuty_id
+  final Map<String, dynamic> payload = {
+    'cuty_id': cuti.cutyId,  // Include the cuty_id from the passed Cuti object
+  };
+
+  final response = await http.delete(
+    Uri.parse('${Variables.baseUrl}/cuti/hapus-data-cuti/${cuti.cutyId}'),
+    headers: {
+      'Authorization': 'Bearer $token',
+      'Content-Type': 'application/json', // Add the content type as JSON
+    },
+    body: json.encode(payload),
+  );
+
+  if (response.statusCode == 200) {
+    return const Right(null);
+  } else {
+    return const Left('Gagal Menghapus Cuti');
+  }
   }
 }

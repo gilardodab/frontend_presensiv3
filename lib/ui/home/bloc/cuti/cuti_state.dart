@@ -1,40 +1,14 @@
-import 'package:equatable/equatable.dart';
-import '../../../../data/models/response/cuti_response_model.dart';
+part of 'cuti_bloc.dart';
 
-abstract class CutiState extends Equatable {
-  const CutiState();
 
-  @override
-  List<Object> get props => [];
-}
+@freezed
 
-class CutiInitialState extends CutiState {}
-
-class CutiLoadingState extends CutiState {}
-
-class CutiLoadedState extends CutiState {
-  final List<Cuti> cutiList;
-  
-  const CutiLoadedState({required this.cutiList});
-  
-  @override
-  List<Object> get props => [cutiList];
-}
-
-class CutiSuccessState extends CutiState {
-  final String message;
-  
-  const CutiSuccessState(this.message);
-  
-  @override
-  List<Object> get props => [message];
-}
-
-class CutiErrorState extends CutiState {
-  final String errorMessage;
-  
-  const CutiErrorState(this.errorMessage);
-  
-  @override
-  List<Object> get props => [errorMessage];
+class CutiState with _$CutiState {
+  const factory CutiState.initial() = _Initial;
+  const factory CutiState.loading() = _Loading;
+  const factory CutiState.loaded(List<Cuti> cuti) = _Loaded;
+  const factory CutiState.error(String message) = _Error;
+  const factory CutiState.empty() = _Empty;
+  const factory CutiState.success(String message) = _Success;
+  const factory CutiState.added(String message) = _Added;
 }

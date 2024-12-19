@@ -1,58 +1,75 @@
 import 'package:bloc/bloc.dart';
-import 'package:meta/meta.dart';
-
+import 'package:freezed_annotation/freezed_annotation.dart';
 import '../../../../data/datasources/callplan_remote_datasource.dart';
-import 'callplan_event.dart';
-import 'callplan_state.dart';
+import '../../../../data/models/response/callplan_response_model.dart';
+
+part 'callplan_bloc.freezed.dart';
+part 'callplan_event.dart';
+part 'callplan_state.dart';
 
 class CallPlanBloc extends Bloc<CallPlanEvent, CallPlanState> {
-  final CallPlanDataSource callPlanDataSource;
+  final CallPlanRemoteDataSource callPlanRemoteDataSource;
 
-  CallPlanBloc({required this.callPlanDataSource}) : super(CallPlanInitial());
+  // Constructor
+  CallPlanBloc(this.callPlanRemoteDataSource) : super(const _Initial()) {
+    
+    // Event handler for fetching call plans
+    on<_GetCallPlan>((event, emit) async {
+      emit(const _Loading());
+      final result = await callPlanRemoteDataSource.loadCallPlans(event.fromDate, event.toDate);
+      result.fold(
+        (message) => emit(_Error(message)),
+        (callPlanResponse) {
+          if (callPlanResponse.data == null || callPlanResponse.data!.isEmpty) {
+            emit(const _Empty());
+          } else {
+            emit(_Loaded(callPlanResponse.data!));
+          }
+        },
+      );
+    });
+    on<_GetCallPlanBulan>((event, emit) async {
+      emit(const _Loading());
+      final result = await callPlanRemoteDataSource.loadCallPlansBulan();
+      result.fold(
+        (message) => emit(_Error(message)),
+        (callPlanResponse) {
+          if (callPlanResponse.data == null || callPlanResponse.data!.isEmpty) {
+            emit(const _Empty());
+          } else {
+            emit(_Loaded(callPlanResponse.data!));
+          }
+        },
+      );
+    });
 
-  @override
-  Stream<CallPlanState> mapEventToState(CallPlanEvent event) async* {
-    if (event is LoadCallPlansEvent) {
-      yield CallPlanLoadingState();
-      try {
-        final callPlans = await callPlanDataSource.loadCallPlans(event.fromDate, event.toDate);
-        yield CallPlanLoadedState(callPlans: callPlans);
-      } catch (e) {
-        yield CallPlanErrorState(errorMessage: e.toString());
-      }
-    }
+    // Event handler for updating a call plan
+    on<_UpdateCallPlan>((event, emit) async {
+      emit(const _Loading());
+      final result = await callPlanRemoteDataSource.updateCallPlan(event.callPlan);
+      result.fold(
+        (message) => emit(_Error(message)),
+        (l) => emit(const _Success('CallPlan Berhasil Di Ubah')),
+      );
+    });
 
-    if (event is CreateCallPlanEvent) {
-      try {
-        final success = await callPlanDataSource.createCallPlan(event.callPlan);
-        if (success) {
-          yield CallPlanCreatedState();
-        }
-      } catch (e) {
-        yield CallPlanErrorState(errorMessage: e.toString());
-      }
-    }
+    // Event handler for deleting a call plan
+    on<_DeleteCallPlan>((event, emit) async {
+      emit(const _Loading());
+      final result = await callPlanRemoteDataSource.deleteCallPlan(event.callPlan);
+      result.fold(
+        (message) => emit(_Error(message)),
+        (_) => emit(const _Success('CallPlan berhasil diHapus')),
+      );
+    });
 
-    if (event is UpdateCallPlanEvent) {
-      try {
-        final success = await callPlanDataSource.updateCallPlan(event.callPlan);
-        if (success) {
-          yield CallPlanUpdatedState();
-        }
-      } catch (e) {
-        yield CallPlanErrorState(errorMessage: e.toString());
-      }
-    }
-
-    if (event is DeleteCallPlanEvent) {
-      try {
-        final success = await callPlanDataSource.deleteCallPlan(event.callPlanId);
-        if (success) {
-          yield CallPlanDeletedState();
-        }
-      } catch (e) {
-        yield CallPlanErrorState(errorMessage: e.toString());
-      }
-    }
+    on<_AddCallPlan>((event, emit) async {
+     emit(const _Loading());
+      final result = await callPlanRemoteDataSource.addCallPlan(event.callPlan); // Assuming addCallPlan exists in your data source
+      result.fold(
+        (message) => emit(_Error(message)),
+        (_) => emit(const _Added('Call Plan Berhasil Ditambahkan!')),
+      );
+    });
   }
 }

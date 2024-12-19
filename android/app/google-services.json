@@ -1,0 +1,49 @@
+{
+  "project_info": {
+    "project_number": "390528630255",
+    "firebase_url": "https://absen-b0b44-default-rtdb.firebaseio.com",
+    "project_id": "absen-b0b44",
+    "storage_bucket": "absen-b0b44.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:390528630255:android:bc6c739758dceacfd40a1a",
+        "android_client_info": {
+          "package_name": "com.abubakar.absenku"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB5i_tPd0uFYIcUDeXzNV439tZSPDXa1_Y"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:390528630255:android:56f981792fd199b1d40a1a",
+        "android_client_info": {
+          "package_name": "com.presensi.laksatechno"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB5i_tPd0uFYIcUDeXzNV439tZSPDXa1_Y"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

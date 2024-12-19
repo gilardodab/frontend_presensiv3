@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 
+import '../../../core/core.dart';
 import '../bloc/user/user_bloc.dart';
 import '../bloc/user/user_event.dart' as user_event; // Alias for user_event
 import '../bloc/user/user_state.dart' as user_state; // Alias for user_state
@@ -18,13 +21,13 @@ class _UserPageState extends State<UserPage> {
   late TextEditingController emailController;
   late TextEditingController positionController;
   late TextEditingController shiftController;
+  final ImagePicker _picker = ImagePicker();
+  File? _imageFile;
 
   @override
   void initState() {
     super.initState();
-    // Dispatch the event to fetch user data
     context.read<UserBloc>().add(user_event.FetchUserData());
-    // Initialize controllers with default values
     phoneController = TextEditingController();
     nameController = TextEditingController();
     emailController = TextEditingController();
@@ -34,13 +37,21 @@ class _UserPageState extends State<UserPage> {
 
   @override
   void dispose() {
-    // Dispose controllers to avoid memory leaks
     phoneController.dispose();
     nameController.dispose();
     emailController.dispose();
     positionController.dispose();
     shiftController.dispose();
     super.dispose();
+  }
+
+  Future<void> _pickImage() async {
+    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        _imageFile = File(pickedFile.path);
+      });
+    }
   }
 
   @override
@@ -60,9 +71,8 @@ class _UserPageState extends State<UserPage> {
         child: BlocBuilder<UserBloc, user_state.UserState>(
           builder: (context, state) {
             if (state is user_state.UserLoading) {
-              return const Center(child: CircularProgressIndicator()); // Show loading indicator
+              return const Center(child: CircularProgressIndicator());
             } else if (state is user_state.UserDataFetched) {
-              // Populate controllers with user data
               phoneController.text = state.userResponse.data?.employeesCode ?? 'N/A';
               nameController.text = state.userResponse.data?.employeesName ?? 'N/A';
               emailController.text = state.userResponse.data?.employeesEmail ?? 'N/A';
@@ -76,10 +86,40 @@ class _UserPageState extends State<UserPage> {
                   children: [
                     const Text(
                       'Profile',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 18.0),
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
                     ),
                     const SizedBox(height: 16.0),
+                    Center(
+                      child: Stack(
+                        alignment: Alignment.bottomRight,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(4.0),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(50.0),
+                              child: _imageFile == null
+                                  ? Image.network(
+                                      'https://i.pinimg.com/originals/1b/14/53/1b14536a5f7e70664550df4ccaa5b231.jpg',
+                                      width: 120.0,
+                                      height: 120.0,
+                                      fit: BoxFit.cover,
+                                    )
+                                  : Image.file(
+                                      _imageFile!,
+                                      width: 120.0,
+                                      height: 120.0,
+                                      fit: BoxFit.cover,
+                                    ),
+                            ),
+                          ),
+                          IconButton(
+                            padding: EdgeInsets.zero,
+                            onPressed: _pickImage,
+                            icon: Assets.icons.edit.svg(),
+                          ),
+                        ],
+                      ),
+                    ),
                     _buildProfileField("No. HP", phoneController),
                     _buildProfileField("Nama", nameController),
                     _buildProfileField("Email", emailController),
@@ -89,7 +129,6 @@ class _UserPageState extends State<UserPage> {
                     Center(
                       child: ElevatedButton(
                         onPressed: () {
-                          // Save Profile function here if needed
                           _updateProfile(context);
                         },
                         style: ElevatedButton.styleFrom(
@@ -106,9 +145,9 @@ class _UserPageState extends State<UserPage> {
                 ),
               );
             } else if (state is user_state.UserLoadFailure) {
-              return Center(child: Text("Error: ${state.error}")); // Show error message
+              return Center(child: Text("Error: ${state.error}"));
             } else {
-              return const Center(child: Text('Unknown state')); // Handle unknown state
+              return const Center(child: Text('Unknown state'));
             }
           },
         ),
@@ -117,7 +156,6 @@ class _UserPageState extends State<UserPage> {
   }
 
   Future<void> _updateProfile(BuildContext context) async {
-    // Implement your update profile logic here
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -156,7 +194,7 @@ class _UserPageState extends State<UserPage> {
         const SizedBox(height: 8.0),
         TextField(
           controller: controller,
-          enabled: enabled,  // Disable the input field if enabled is false
+          enabled: enabled,
           decoration: const InputDecoration(
             border: OutlineInputBorder(),
           ),

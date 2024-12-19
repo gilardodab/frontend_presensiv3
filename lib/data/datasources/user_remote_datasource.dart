@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:dartz/dartz.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert'; // Untuk parsing JSON
@@ -42,7 +44,32 @@ class UserRemoteDatasource {
         return Left(_getErrorMessageForStatusCode(response.statusCode));
       }
     } catch (e) {
-      return Left('Failed to get data: $e');
+      return Left('Gagal Memuat data: $e');
+    }
+      }
+
+  //update user
+  Future<Either<String, UserResponseModel>> updateUser(Data user) async {
+    try {
+      final authData = await AuthLocalDatasource().getAuthData();
+      final url = Uri.parse('${Variables.baseUrl}/karyawan/update-profile-user');
+      final response = await http.post(
+        url,
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ${authData?.token}',
+        },
+        body: json.encode(user.toMap()),
+      );
+
+      if (response.statusCode == 200) {
+      return Right(UserResponseModel.fromJson(json.decode(response.body)));
+        } else {
+        return Left(_getErrorMessageForStatusCode(response.statusCode));
+      }
+    } catch (e) {
+      return Left('Gagal Memuat data: $e');
     }
       }
 

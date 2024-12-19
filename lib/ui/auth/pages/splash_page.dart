@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/constants/colors.dart';
 import '../../../core/core.dart';
 import '../../../data/datasources/auth_local_datasource.dart';
 import '../../home/pages/main_page.dart';
@@ -43,12 +42,12 @@ class _SplashPageState extends State<SplashPage> {
             // ignore: unrelated_type_equality_checks
             if (snapshot.data! == true) {
               Future.delayed(
-                const Duration(seconds: 2),
+                const Duration(seconds: 1),
                 () => context.pushReplacement(const MainPage()),
               );
             } else {
               Future.delayed(
-                const Duration(seconds: 2),
+                const Duration(seconds: 1),
                 () => context.pushReplacement(const LoginPage()),
               );
             }

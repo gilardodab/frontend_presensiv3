@@ -1,63 +1,71 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:frontend_presensiv3/data/models/response/cuti_response_model.dart';
+
 import '../../../../data/datasources/cuti_remote_datasource.dart';
-import 'cuti_event.dart';
-import 'cuti_state.dart';
+
+part 'cuti_event.dart';
+part 'cuti_state.dart';
+part 'cuti_bloc.freezed.dart';
 
 class CutiBloc extends Bloc<CutiEvent, CutiState> {
-  final CutiDataSource cutiDataSource;
+  final CutiRemoteDataSource cutiDataSource;
 
-  CutiBloc({required this.cutiDataSource}) : super(CutiInitialState()) {
-    on<FetchCutiEvent>(_fetchCutiData);
-    on<AddCutiEvent>(_addCuti);
-    on<EditCutiEvent>(_editCuti);
-    on<DeleteCutiEvent>(_deleteCuti);
-  }
+  CutiBloc(this.cutiDataSource) : super(const _Initial()) {
+    // on<FetchCutiEvent>((event, emit) async {
+    //   emit(const _Loading());
+    //   final result = await cutiDataSource.fetchCutiData(event.fromDate, event.toDate);
+    //     result.fold(
+    //       (message) => emit(_Error(message)),
+    //     (cutiResponse) {
+    //       if (cutiResponse.data == null || cutiResponse.data!.isEmpty) {
+    //         emit(const _Empty());
+    //       } else {
+    //         emit (_Loaded(cutiResponse.data!));
+    //       }
+    //     },
+    //     );
+    //   });
 
-  // Fetch all cuti data
-  void _fetchCutiData(FetchCutiEvent event, Emitter<CutiState> emit) async {
-    emit(CutiLoadingState());
-    try {
-      final cutiList = await cutiDataSource.fetchCutiData();
-      emit(CutiLoadedState(cutiList: cutiList));
-    } catch (e) {
-      emit(CutiErrorState('Failed to load cuti: $e'));
-    }
-  }
+      on<FetchCutiEventBulan>((event, emit) async {
+      emit(const _Loading());
+      final result = await cutiDataSource.fetchCutiDataBulan();
+        result.fold(
+          (message) => emit(_Error(message)),
+        (cutiResponse) {
+          if (cutiResponse.data == null || cutiResponse.data!.isEmpty) {
+            emit(const _Empty());
+          } else {
+            emit (_Loaded(cutiResponse.data!));
+          }
+        },
+        );
+      });
+    on<AddCutiEvent>((event, emit) async {
+     emit(const _Loading());
+      final result = await cutiDataSource.addCuti(event.cuti);
+      result.fold(
+        (message) => emit(_Error(message)),
+        (_) => emit(const _Added('Cuti berhasil ditambahkan')),
+      );
+    });
 
-  // Add a new cuti
-  void _addCuti(AddCutiEvent event, Emitter<CutiState> emit) async {
-    emit(CutiLoadingState());
-    try {
-      await cutiDataSource.addCuti(event.cuti);
-      emit(CutiSuccessState('Cuti added successfully'));
-      add(FetchCutiEvent()); // Refresh data after adding
-    } catch (e) {
-      emit(CutiErrorState('Failed to add cuti: $e'));
-    }
-  }
+    on<EditCutiEvent>((event, emit) async {
+      emit(const _Loading());
+      final result = await cutiDataSource.editCuti(event.cuti);
+      result.fold(
+        (message) => emit(_Error(message)),
+        (_) => emit(const _Success('Cuti berhasil diedit')),
+      );
+    });
 
-  // Edit an existing cuti
-  void _editCuti(EditCutiEvent event, Emitter<CutiState> emit) async {
-    emit(CutiLoadingState());
-    try {
-      await cutiDataSource.editCuti(event.id, event.cuti);
-      emit(CutiSuccessState('Cuti updated successfully'));
-      add(FetchCutiEvent()); // Refresh data after editing
-    } catch (e) {
-      emit(CutiErrorState('Failed to update cuti: $e'));
-    }
-  }
-
-  // Delete a cuti
-  void _deleteCuti(DeleteCutiEvent event, Emitter<CutiState> emit) async {
-    emit(CutiLoadingState());
-    try {
-      await cutiDataSource.deleteCuti(event.id);
-      emit(CutiSuccessState('Cuti deleted successfully'));
-      add(FetchCutiEvent()); // Refresh data after deleting
-    } catch (e) {
-      emit(CutiErrorState('Failed to delete cuti: $e'));
-    }
+    on<DeleteCutiEvent>((event, emit) async {
+      emit(const _Loading());
+      final result = await cutiDataSource.deleteCuti(event.cuti);
+      result.fold(
+        (message) => emit(_Error(message)),
+        (_) => emit(const _Success('Cuti berhasil dihapus')),
+      );
+    });
   }
 }

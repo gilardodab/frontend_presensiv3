@@ -1,9 +1,11 @@
 import 'package:detect_fake_location/detect_fake_location.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:frontend_presensiv3/core/core.dart';
 import 'package:frontend_presensiv3/ui/home/pages/notification_page.dart';
 import 'package:frontend_presensiv3/ui/home/pages/presensi.dart';
 import 'package:frontend_presensiv3/ui/home/pages/user_page.dart';
+import 'package:intl/intl.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../../core/network/network_info.dart';
 import '../bloc/presensi/presensi_bloc.dart';
@@ -27,7 +29,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  DateTime currentDate = DateTime.now();
+  String currentDate = DateTime.now().toFormattedDate();
   bool isLoading = false;
   bool isOffline = false;
 
@@ -85,14 +87,14 @@ class _HomeScreenState extends State<HomeScreen> {
     _photo();
     context.read<PresensiBloc>().add(presensi_event.FetchPresensiData());
     setState(() {
-      currentDate = DateTime.now();
+      currentDate = DateTime.now().toFormattedDate();
       isLoading = false;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final formattedDate = "${currentDate.day}-${currentDate.month}-${currentDate.year}";
+    final formattedDate = DateTime.now().toFormattedDate();
 
     return Scaffold(
       appBar: AppBar(
@@ -104,12 +106,12 @@ class _HomeScreenState extends State<HomeScreen> {
           Padding(
             padding: const EdgeInsets.all(1.0),
             child: IconButton(
-              icon: Icon(Icons.notifications),
+              icon: const Icon(Icons.notifications),
               color: Colors.white,
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => NotificationPage()),
+                  MaterialPageRoute(builder: (context) => const NotificationPage()),
                 );
               },
               tooltip: 'Notifikasi',
@@ -121,7 +123,7 @@ class _HomeScreenState extends State<HomeScreen> {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => UserPage()),
+                MaterialPageRoute(builder: (context) => const UserPage()),
               );
             },
             tooltip: 'Profile',
@@ -133,7 +135,7 @@ class _HomeScreenState extends State<HomeScreen> {
       body: RefreshIndicator(
         onRefresh: _refreshData,
         child: SingleChildScrollView(
-          physics: AlwaysScrollableScrollPhysics(),
+          physics: const AlwaysScrollableScrollPhysics(),
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
@@ -145,7 +147,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 const SizedBox(height: 20),
                 _buildGridView(),
                 const SizedBox(height: 20),
-                _buildPresensiButton(),
+                // _buildPresensiButton(),
                 const SizedBox(height: 20),
                 _buildPresensiDataTable(),
                 const SizedBox(height: 20),
@@ -154,6 +156,64 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ),
+      //floating button 
+            bottomNavigationBar: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(25.0),
+        child: ElevatedButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const AttendancePage()),
+            );
+          },
+          style: ElevatedButton.styleFrom(
+            minimumSize: const Size(double.infinity, 50),
+            foregroundColor: Colors.white,
+            backgroundColor: const Color.fromARGB(255, 114, 76, 175),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+          child: const Text(
+            'Presensi',
+            style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+          ),
+        ),
+      ),
+      // bottomNavigationBar: Container(
+      //   width: double.infinity,
+      //   padding: const EdgeInsets.all(15.0),
+      //   child: Stack(
+      //     alignment: Alignment.center,
+      //     children: [
+      //       // Tombol tanpa efek shimmer
+      //       ElevatedButton(
+      //         onPressed: () {
+      //           Navigator.push(
+      //             context,
+      //             MaterialPageRoute(builder: (context) => const AttendancePage()),
+      //           );
+      //         },
+      //         style: ElevatedButton.styleFrom(
+      //           minimumSize: const Size(double.infinity, 50),
+      //           foregroundColor: Colors.white,
+      //           backgroundColor: const Color.fromARGB(255, 114, 76, 175),
+      //           shape: RoundedRectangleBorder(
+      //             borderRadius: BorderRadius.circular(12),
+      //           ),
+      //         ),
+      //         child: const SizedBox.shrink(), // Empty child, keeping the button's shape
+      //       ),
+      //       // Teks yang tetap terlihat di atas tombol
+      //       const Text(
+      //         'Presensi Masuk',
+      //         style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.white),
+      //       ),
+      //     ],
+      //   ),
+      // ),
+
     );
   }
 
@@ -183,7 +243,7 @@ Widget _photo() {
                   ),
                 ),
               )
-            : Icon(
+            : const Icon(
                 Icons.person, 
                 size: 20, 
                 color: Colors.white
@@ -192,7 +252,7 @@ Widget _photo() {
     } else if (state is user_state.UserLoadFailure) {
       return Text('Error: ${state.error}');
     } else {
-      return Text('Loading...');
+      return const Text('Loading...');
     }
   });
 }
@@ -228,7 +288,7 @@ Widget _buildUserProfile() {
                   ? Icon(Icons.person, size: 20, color: Colors.white)
                   : null,
             ),
-            SizedBox(width: 9),
+            const SizedBox(width: 9),
             isLoading ? _nameShimmerLoader() : _buildUserInfo(),
           ],
         );
@@ -319,7 +379,7 @@ Widget _buildUserProfile() {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => AttendancePage()),
+            MaterialPageRoute(builder: (context) => const AttendancePage()),
           );
         },
         child: const Text('Presensi Masuk'),
@@ -348,13 +408,17 @@ Widget _buildUserProfile() {
                                   DataColumn(label: Text('Pulang')),
                                 ],
                               rows: state.presensiResponse.data?.map((presensi) => DataRow(cells: [
-                                    DataCell(Text(presensi.presenceDate ?? 'N/A')),
-                                    DataCell(Text(presensi.timeIn ?? 'N/A')),
-                                    DataCell(Text(presensi.timeOut ?? 'N/A')),
+                                   DataCell(
+                                              Text(
+                                                DateFormat('d-MM-yyyy').format(DateTime.parse(presensi.presenceDate)),
+                                              ),
+                                            ),
+                                    DataCell(Text(presensi.timeIn)),
+                                    DataCell(Text(presensi.timeOut)),
                                   ])).toList() ?? [],
                             );
                           } else if (state is presensi_state.PresensiError) {
-                            return Text('Error: ${state.error}');
+                            return Text(state.error);
                           } else {
                             return const Text('Loading...');
                           }

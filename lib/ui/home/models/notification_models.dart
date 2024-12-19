@@ -3,13 +3,13 @@ import '../../../core/core.dart';
 class NotificationModel {
   final String label;
   final String title;
-  final String message;
+  final String body;
   final DateTime datetime;
 
   NotificationModel({
     required this.label,
     required this.title,
-    required this.message,
+    required this.body,
     required this.datetime,
   });
 

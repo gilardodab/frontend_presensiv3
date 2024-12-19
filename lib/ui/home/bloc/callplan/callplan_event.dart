@@ -1,24 +1,11 @@
-import '../../../../data/models/response/callplan_response_model.dart';
+// callplan_event.dart
+part of 'callplan_bloc.dart';
 
-abstract class CallPlanEvent {}
-
-class LoadCallPlansEvent extends CallPlanEvent {
-  final String fromDate;
-  final String toDate;
-  LoadCallPlansEvent({required this.fromDate, required this.toDate});
-}
-
-class CreateCallPlanEvent extends CallPlanEvent {
-  final CallPlanModel callPlan;
-  CreateCallPlanEvent({required this.callPlan});
-}
-
-class UpdateCallPlanEvent extends CallPlanEvent {
-  final CallPlanModel callPlan;
-  UpdateCallPlanEvent({required this.callPlan});
-}
-
-class DeleteCallPlanEvent extends CallPlanEvent {
-  final int callPlanId;
-  DeleteCallPlanEvent({required this.callPlanId});
+@freezed
+class CallPlanEvent with _$CallPlanEvent {
+  const factory CallPlanEvent.getCallPlanBulan() = _GetCallPlanBulan;
+  const factory CallPlanEvent.getCallPlan(String fromDate, String toDate) = _GetCallPlan;
+  const factory CallPlanEvent.updateCallPlan(CallPlan callPlan) = _UpdateCallPlan;
+  const factory CallPlanEvent.deleteCallPlan(CallPlan callPlan) = _DeleteCallPlan;
+  const factory CallPlanEvent.addCallPlan(CallPlan callPlan) = _AddCallPlan;
 }

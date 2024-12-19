@@ -1,6 +1,4 @@
 import 'package:bloc/bloc.dart';
-import 'package:dartz/dartz.dart';
-import 'package:equatable/equatable.dart';
 import '../../../../data/datasources/user_remote_datasource.dart';
 import 'user_event.dart' as user_event; // Alias for user_event
 import 'user_state.dart' as user_state; // Alias for user_state

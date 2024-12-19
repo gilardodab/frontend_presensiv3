@@ -25,6 +25,10 @@ class $AssetsIconsGen {
   /// File path: assets/icons/calendar.svg
   SvgGenImage get calendar => const SvgGenImage('assets/icons/calendar.svg');
 
+  /// File path: assets/icons/callplanbg.svg
+  SvgGenImage get callplanbg =>
+      const SvgGenImage('assets/icons/callplanbg.svg');
+
   /// File path: assets/icons/edit.svg
   SvgGenImage get edit => const SvgGenImage('assets/icons/edit.svg');
 
@@ -58,6 +62,7 @@ class $AssetsIconsGen {
         attendance,
         back,
         calendar,
+        callplanbg,
         edit,
         email,
         image,
@@ -78,12 +83,22 @@ class $AssetsImagesGen {
   AssetGenImage get bgHome1 =>
       const AssetGenImage('assets/images/bg_home1.png');
 
+  /// File path: assets/images/callplanpng.png
+  AssetGenImage get callplanpng =>
+      const AssetGenImage('assets/images/callplanpng.png');
+
+  /// File path: assets/images/cutipng.png
+  AssetGenImage get cutipng => const AssetGenImage('assets/images/cutipng.png');
+
   /// File path: assets/images/empty_state.png
   AssetGenImage get emptyState =>
       const AssetGenImage('assets/images/empty_state.png');
 
   /// File path: assets/images/failed.png
   AssetGenImage get failed => const AssetGenImage('assets/images/failed.png');
+
+  /// File path: assets/images/icon_yf.png
+  AssetGenImage get iconYf => const AssetGenImage('assets/images/icon_yf.png');
 
   /// File path: assets/images/img_my_location.png
   AssetGenImage get imgMyLocation =>
@@ -115,8 +130,11 @@ class $AssetsImagesGen {
   List<AssetGenImage> get values => [
         bgHome,
         bgHome1,
+        callplanpng,
+        cutipng,
         emptyState,
         failed,
+        iconYf,
         imgMyLocation,
         logo,
         logoWhite,

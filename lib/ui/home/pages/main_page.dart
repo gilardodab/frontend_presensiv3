@@ -22,7 +22,7 @@ class _MainPageState extends State<MainPage> {
     HomeScreen(),
     const HistoryPage(),
     const SettingPage(),
-    const UserPage(),
+    // const UserPage(),
     // const ProfilePage()
   ];
   @override
@@ -76,7 +76,7 @@ class _MainPageState extends State<MainPage> {
                     BlendMode.srcIn,
                   ),
                 ),
-                label: 'History',
+                label: 'Riwayat',
               ),
               BottomNavigationBarItem(
                 icon: Assets.icons.nav.setting.svg(
@@ -87,15 +87,15 @@ class _MainPageState extends State<MainPage> {
                 ),
                 label: 'Setting',
               ),
-              BottomNavigationBarItem(
-                icon: Assets.icons.nav.profile.svg(
-                  colorFilter: ColorFilter.mode(
-                    _selectedIndex == 3 ? const Color.fromARGB(255, 114, 76, 175) : AppColors.grey,
-                    BlendMode.srcIn,
-                  ),
-                ),
-                label: 'Profile',
-              ),
+              // BottomNavigationBarItem(
+              //   icon: Assets.icons.nav.profile.svg(
+              //     colorFilter: ColorFilter.mode(
+              //       _selectedIndex == 3 ? const Color.fromARGB(255, 114, 76, 175) : AppColors.grey,
+              //       BlendMode.srcIn,
+              //     ),
+              //   ),
+              //   label: 'Profile',
+              // ),
             ],
           ),
         ),

@@ -115,9 +115,9 @@ class _AttendancePageState extends State<AttendancePage> {
         _submitAttendance(base64Image, position.latitude, position.longitude);
       }
     } catch (e) {
-      print("Error taking picture: $e");
+      print("Error mengambil gambar: $e");
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to capture picture. Please try again.')),
+        SnackBar(content: Text('Gagal mengambil gambar. Silahkan coba lagi.')),
       );
     }
   }
@@ -158,10 +158,10 @@ class _AttendancePageState extends State<AttendancePage> {
       if (response.status == 'success') {
         _showSuccessPopup();
       } else {
-        _showErrorPopup(response.message ?? 'Failed to record attendance');
+        _showErrorPopup(response.message ?? 'Gagal Melakukan Presensi');
       }
     } catch (e) {
-      _showErrorPopup('An error occurred while submitting attendance: $e');
+      _showErrorPopup('Gagal kirim presensi: $e');
     }
   }
 

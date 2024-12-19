@@ -1,23 +1,24 @@
-import '../../../../data/models/response/callplan_response_model.dart';
+// callplan_state.dart
+part of 'callplan_bloc.dart';
 
-abstract class CallPlanState {}
+@freezed
+class CallPlanState with _$CallPlanState {
+  // Initial state when the BLoC is first created
+  const factory CallPlanState.initial() = _Initial;
 
-class CallPlanInitial extends CallPlanState {}
+  // Loading state when the data is being fetched
+  const factory CallPlanState.loading() = _Loading;
 
-class CallPlanLoadingState extends CallPlanState {}
+  // State when the data is successfully loaded
+  const factory CallPlanState.loaded(List<CallPlan> callPlans) = _Loaded;
 
-class CallPlanLoadedState extends CallPlanState {
-  final List<CallPlanModel> callPlans;
-  CallPlanLoadedState({required this.callPlans});
+  // State when there is an error in fetching or processing data
+  const factory CallPlanState.error(String message) = _Error;
+
+  // State when no data is available
+  const factory CallPlanState.empty() = _Empty;
+
+  // Success state after a successful update or deletion of data
+  const factory CallPlanState.success(String message) = _Success;
+   const factory CallPlanState.added(String message) = _Added;
 }
-
-class CallPlanErrorState extends CallPlanState {
-  final String errorMessage;
-  CallPlanErrorState({required this.errorMessage});
-}
-
-class CallPlanCreatedState extends CallPlanState {}
-
-class CallPlanUpdatedState extends CallPlanState {}
-
-class CallPlanDeletedState extends CallPlanState {}
